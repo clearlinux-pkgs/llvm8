@@ -1,0 +1,28 @@
+From 88155749e05ec767d5af76d77d3e8f2e92412a29 Mon Sep 17 00:00:00 2001
+From: Thiago Macieira <thiago.macieira@intel.com>
+Date: Wed, 10 Oct 2018 19:32:59 -0700
+Subject: [cfe] Make Clang default to Westmere on Clear Linux
+
+Signed-off-by: Thiago Macieira <thiago.macieira@intel.com>
+---
+ lib/Driver/ToolChains/Arch/X86.cpp | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/clang/lib/Driver/ToolChains/Arch/X86.cpp b/tools/clang/lib/Driver/ToolChains/Arch/X86.cpp
+index 45648945d5..c280c060aa 100644
+--- a/tools/clang/lib/Driver/ToolChains/Arch/X86.cpp
++++ b/tools/clang/lib/Driver/ToolChains/Arch/X86.cpp
+@@ -101,8 +101,8 @@ const char *x86::getX86TargetCPU(const ArgList &Args,
+   case llvm::Triple::Haiku:
+     return "i586";
+   default:
+-    // Fallback to p4.
+-    return "pentium4";
++    // Clear Linux defaults to "westmere"
++    return "westmere";
+   }
+ }
+ 
+-- 
+2.21.0
+

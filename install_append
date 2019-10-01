@@ -1,0 +1,28 @@
+# -*- sh -*-
+# Remove files that should come from the main llvm package
+rm -rf %{buildroot}/usr/include
+rm -rf %{buildroot}/usr/lib64/*.a
+rm -rf %{buildroot}/usr/lib64/*.so
+rm -rf %{buildroot}/usr/lib64/cmake
+rm -rf %{buildroot}/usr/libexec
+
+mv %{buildroot}/usr/share/package-licenses %{buildroot}/usr/
+rm -rf %{buildroot}/usr/share/*
+mv %{buildroot}/usr/package-licenses %{buildroot}/usr/share
+
+# Move the tools to a versioned bin dir and then create symlinks back
+pushd %{buildroot}/usr
+FULL_VERSION=%{version}
+VERSION=${FULL_VERSION%%%%.*}
+mv bin lib64/clang/$FULL_VERSION
+mkdir bin
+for f in lib64/clang/$FULL_VERSION/bin/*; do
+    case "$f" in
+        *-$VERSION)
+            # Already versioned, leave it alone
+            continue
+            ;;
+    esac
+    ln -s ../$f bin/${f##*/}-$VERSION
+done
+popd
