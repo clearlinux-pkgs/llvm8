@@ -7,12 +7,13 @@
 %define keepstatic 1
 Name     : llvm8
 Version  : 8.0.1
-Release  : 2
+Release  : 3
 URL      : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
 Source0  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
-Source1  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz
-Source2 : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz.sig
-Summary  : Google microbenchmark framework
+Source1  : https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/v8.0.1-2/SPIRV-8.0.1.2.tar.gz
+Source2  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz
+Source3 : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz.sig
+Summary  : LLVM/SPIR-V bi-directional translator
 Group    : Development/Tools
 License  : Apache-2.0 BSD-3-Clause MIT NCSA
 Requires: llvm8-bin = %{version}-%{release}
@@ -104,9 +105,13 @@ license components for the llvm8 package.
 %prep
 %setup -q -n llvm-8.0.1.src
 cd ..
+%setup -q -T -D -n llvm-8.0.1.src -b 2
+cd ..
 %setup -q -T -D -n llvm-8.0.1.src -b 1
 mkdir -p tools/clang
 cp -r %{_topdir}/BUILD/cfe-8.0.1.src/* %{_topdir}/BUILD/llvm-8.0.1.src/tools/clang
+mkdir -p projects/SPIRV
+cp -r %{_topdir}/BUILD/SPIRV-LLVM-Translator-8.0.1-2/* %{_topdir}/BUILD/llvm-8.0.1.src/projects/SPIRV
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
@@ -125,7 +130,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1570140242
+export SOURCE_DATE_EPOCH=1570145167
 unset LD_AS_NEEDED
 mkdir -p clr-build
 pushd clr-build
@@ -178,10 +183,11 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 make test
 
 %install
-export SOURCE_DATE_EPOCH=1569998763
+export SOURCE_DATE_EPOCH=1570145167
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/llvm8
 cp LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/LICENSE.TXT
+cp projects/SPIRV/LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/projects_SPIRV_LICENSE.TXT
 cp test/YAMLParser/LICENSE.txt %{buildroot}/usr/share/package-licenses/llvm8/test_YAMLParser_LICENSE.txt
 cp tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/tools_clang_LICENSE.TXT
 cp tools/clang/tools/clang-format-vs/ClangFormat/license.txt %{buildroot}/usr/share/package-licenses/llvm8/tools_clang_tools_clang-format-vs_ClangFormat_license.txt
@@ -207,6 +213,7 @@ rm -rf %{buildroot}/usr/include
 rm -rf %{buildroot}/usr/lib64/*.a
 rm -rf %{buildroot}/usr/lib64/*.so
 rm -rf %{buildroot}/usr/lib64/cmake
+rm -rf %{buildroot}/usr/lib64/pkgconfig
 rm -rf %{buildroot}/usr/libexec
 mv %{buildroot}/usr/share/package-licenses %{buildroot}/usr/
 rm -rf %{buildroot}/usr/share/*
@@ -289,6 +296,7 @@ popd
 /usr/lib64/clang/8.0.1/bin/llvm-readobj
 /usr/lib64/clang/8.0.1/bin/llvm-rtdyld
 /usr/lib64/clang/8.0.1/bin/llvm-size
+/usr/lib64/clang/8.0.1/bin/llvm-spirv
 /usr/lib64/clang/8.0.1/bin/llvm-split
 /usr/lib64/clang/8.0.1/bin/llvm-stress
 /usr/lib64/clang/8.0.1/bin/llvm-strings
@@ -365,6 +373,7 @@ popd
 /usr/bin/llvm-readobj-8
 /usr/bin/llvm-rtdyld-8
 /usr/bin/llvm-size-8
+/usr/bin/llvm-spirv-8
 /usr/bin/llvm-split-8
 /usr/bin/llvm-stress-8
 /usr/bin/llvm-strings-8
@@ -546,6 +555,7 @@ popd
 %files license
 %defattr(0644,root,root,0755)
 /usr/share/package-licenses/llvm8/LICENSE.TXT
+/usr/share/package-licenses/llvm8/projects_SPIRV_LICENSE.TXT
 /usr/share/package-licenses/llvm8/test_YAMLParser_LICENSE.txt
 /usr/share/package-licenses/llvm8/tools_clang_LICENSE.TXT
 /usr/share/package-licenses/llvm8/tools_clang_tools_clang-format-vs_ClangFormat_license.txt

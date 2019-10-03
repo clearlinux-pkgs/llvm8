@@ -4,6 +4,7 @@ rm -rf %{buildroot}/usr/include
 rm -rf %{buildroot}/usr/lib64/*.a
 rm -rf %{buildroot}/usr/lib64/*.so
 rm -rf %{buildroot}/usr/lib64/cmake
+rm -rf %{buildroot}/usr/lib64/pkgconfig
 rm -rf %{buildroot}/usr/libexec
 
 mv %{buildroot}/usr/share/package-licenses %{buildroot}/usr/

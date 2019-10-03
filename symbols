@@ -70,7 +70,6 @@ libLTO.so.8:thinlto_set_generated_objects_dir
 libOptRemarks.so.8:LLVMOptRemarkVersion
 libOptRemarks.so.8:LLVM_8
 libclang.so.8:LLVM_8
-libclang.so.8:_ZNSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS5_EE17_M_realloc_insertIJS5_EEEvN9__gnu_cxx17__normal_iteratorIPS5_S7_EEDpOT_
 libclang.so.8:clang_BlockCommandComment_getArgText
 libclang.so.8:clang_BlockCommandComment_getCommandName
 libclang.so.8:clang_BlockCommandComment_getNumArgs
