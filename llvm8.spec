@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : llvm8
 Version  : 8.0.1
-Release  : 1
+Release  : 2
 URL      : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
 Source0  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
 Source1  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz
@@ -18,7 +18,7 @@ License  : Apache-2.0 BSD-3-Clause MIT NCSA
 Requires: llvm8-bin = %{version}-%{release}
 Requires: llvm8-lib = %{version}-%{release}
 Requires: llvm8-license = %{version}-%{release}
-Requires: llvm-extras = %{version}-%{release}
+Requires: llvm8-extras = %{version}-%{release}
 BuildRequires : Sphinx
 BuildRequires : Z3-dev
 BuildRequires : Z3-dev32
@@ -125,7 +125,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1569998763
+export SOURCE_DATE_EPOCH=1570140242
 unset LD_AS_NEEDED
 mkdir -p clr-build
 pushd clr-build
