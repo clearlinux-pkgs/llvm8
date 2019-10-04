@@ -7,10 +7,10 @@
 %define keepstatic 1
 Name     : llvm8
 Version  : 8.0.1
-Release  : 3
+Release  : 4
 URL      : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
 Source0  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
-Source1  : https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/v8.0.1-2/SPIRV-8.0.1.2.tar.gz
+Source1  : https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/v8.0.1-1/SPIRV-8.0.1.1.tar.gz
 Source2  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz
 Source3 : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz.sig
 Summary  : LLVM/SPIR-V bi-directional translator
@@ -111,7 +111,7 @@ cd ..
 mkdir -p tools/clang
 cp -r %{_topdir}/BUILD/cfe-8.0.1.src/* %{_topdir}/BUILD/llvm-8.0.1.src/tools/clang
 mkdir -p projects/SPIRV
-cp -r %{_topdir}/BUILD/SPIRV-LLVM-Translator-8.0.1-2/* %{_topdir}/BUILD/llvm-8.0.1.src/projects/SPIRV
+cp -r %{_topdir}/BUILD/SPIRV-LLVM-Translator-8.0.1-1/* %{_topdir}/BUILD/llvm-8.0.1.src/projects/SPIRV
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
@@ -130,7 +130,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1570145167
+export SOURCE_DATE_EPOCH=1570152654
 unset LD_AS_NEEDED
 mkdir -p clr-build
 pushd clr-build
@@ -183,7 +183,7 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 make test
 
 %install
-export SOURCE_DATE_EPOCH=1570145167
+export SOURCE_DATE_EPOCH=1570152654
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/llvm8
 cp LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/LICENSE.TXT
