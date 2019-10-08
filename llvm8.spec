@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : llvm8
 Version  : 8.0.1
-Release  : 4
+Release  : 6
 URL      : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
 Source0  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
 Source1  : https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/v8.0.1-1/SPIRV-8.0.1.1.tar.gz
@@ -54,8 +54,9 @@ Patch7: clang-0003-Make-Clang-default-to-Westmere-on-Clear-Linux.patch
 Patch8: clang-0004-Change-type-of-block-pointer-for-OpenCL.patch
 Patch9: clang-0005-Simplify-LLVM-IR-generated-for-OpenCL-blocks.patch
 Patch10: clang-0006-Fix-assertion-due-to-blocks.patch
-Patch11: fma.patch
-Patch12: clang-gcc.patch
+Patch11: clang-0007-Add-the-LLVM-major-version-number-to-the-Gold-LTO-pl.patch
+Patch12: fma.patch
+Patch13: clang-gcc.patch
 
 %description
 See docs/CMake.html for instructions on how to build LLVM with CMake.
@@ -124,13 +125,14 @@ cp -r %{_topdir}/BUILD/SPIRV-LLVM-Translator-8.0.1-1/* %{_topdir}/BUILD/llvm-8.0
 %patch10 -p1
 %patch11 -p1
 %patch12 -p1
+%patch13 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1570152654
+export SOURCE_DATE_EPOCH=1570597659
 unset LD_AS_NEEDED
 mkdir -p clr-build
 pushd clr-build
@@ -183,7 +185,7 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 make test
 
 %install
-export SOURCE_DATE_EPOCH=1570152654
+export SOURCE_DATE_EPOCH=1570597659
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/llvm8
 cp LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/LICENSE.TXT
@@ -209,6 +211,7 @@ rm -f %{buildroot}/usr/lib64/clang/8.0.1/lib/linux/libclang_rt.scudo_minimal-i38
 rm -f %{buildroot}/usr/lib64/clang/8.0.1/lib/linux/libclang_rt.ubsan_minimal-i386.so
 rm -f %{buildroot}/usr/lib64/clang/8.0.1/lib/linux/libclang_rt.ubsan_standalone-i386.so
 ## install_append content
+mv %{buildroot}/usr/lib64/LLVMgold.so %{buildroot}/usr/lib64/LLVMgold.so.save
 rm -rf %{buildroot}/usr/include
 rm -rf %{buildroot}/usr/lib64/*.a
 rm -rf %{buildroot}/usr/lib64/*.so
@@ -231,6 +234,9 @@ continue
 esac
 ln -s ../$f bin/${f##*/}-$VERSION
 done
+mv lib64/LLVMgold.so.save lib64/LLVMgold-$VERSION.so
+mkdir -p lib/bfd-plugins
+ln -s ../../lib64/LLVMgold-$VERSION.so lib/bfd-plugins
 popd
 ## install_append end
 
@@ -391,6 +397,7 @@ popd
 
 %files extras
 %defattr(-,root,root,-)
+/usr/lib64/LLVMgold-8.so
 /usr/lib64/clang/8.0.1/include/__clang_cuda_builtin_vars.h
 /usr/lib64/clang/8.0.1/include/__clang_cuda_cmath.h
 /usr/lib64/clang/8.0.1/include/__clang_cuda_complex_builtins.h
@@ -518,6 +525,7 @@ popd
 
 %files lib
 %defattr(-,root,root,-)
+/usr/lib/bfd-plugins/LLVMgold-8.so
 /usr/lib64/libLTO.so.8
 /usr/lib64/libOptRemarks.so.8
 /usr/lib64/libclang.so.8

@@ -143,3 +143,4 @@
 /usr/lib64/clang/8.0.1/lib/linux/libclang_rt.scudo_minimal-x86_64.so
 /usr/lib64/clang/8.0.1/lib/linux/libclang_rt.ubsan_minimal-x86_64.so
 /usr/lib64/clang/8.0.1/lib/linux/libclang_rt.ubsan_standalone-x86_64.so
+/usr/lib64/LLVMgold-8.so

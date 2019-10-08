@@ -1,4 +1,7 @@
 # -*- sh -*-
+# Rename the Gold plugin elsewhere, as we're erasing *.so below
+mv %{buildroot}/usr/lib64/LLVMgold.so %{buildroot}/usr/lib64/LLVMgold.so.save
+
 # Remove files that should come from the main llvm package
 rm -rf %{buildroot}/usr/include
 rm -rf %{buildroot}/usr/lib64/*.a
@@ -26,4 +29,9 @@ for f in lib64/clang/$FULL_VERSION/bin/*; do
     esac
     ln -s ../$f bin/${f##*/}-$VERSION
 done
+
+# Put the LLVM gold plugin back, under the versioned name
+mv lib64/LLVMgold.so.save lib64/LLVMgold-$VERSION.so
+mkdir -p lib/bfd-plugins
+ln -s ../../lib64/LLVMgold-$VERSION.so lib/bfd-plugins
 popd

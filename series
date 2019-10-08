@@ -11,6 +11,7 @@ clang-0003-Make-Clang-default-to-Westmere-on-Clear-Linux.patch
 clang-0004-Change-type-of-block-pointer-for-OpenCL.patch
 clang-0005-Simplify-LLVM-IR-generated-for-OpenCL-blocks.patch
 clang-0006-Fix-assertion-due-to-blocks.patch
+clang-0007-Add-the-LLVM-major-version-number-to-the-Gold-LTO-pl.patch
 
 # SPIRV patches
 fma.patch
