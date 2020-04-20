@@ -7,13 +7,13 @@
 %define keepstatic 1
 Name     : llvm8
 Version  : 8.0.1
-Release  : 8
+Release  : 9
 URL      : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
 Source0  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
 Source1  : https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/v8.0.1-1/SPIRV-8.0.1.1.tar.gz
 Source2  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/cfe-8.0.1.src.tar.xz
-Source3 : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz.sig
-Summary  : LLVM/SPIR-V bi-directional translator
+Source3  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz.sig
+Summary  : Google microbenchmark framework
 Group    : Development/Tools
 License  : Apache-2.0 BSD-3-Clause MIT NCSA
 Requires: llvm8-bin = %{version}-%{release}
@@ -22,7 +22,6 @@ Requires: llvm8-license = %{version}-%{release}
 Requires: llvm8-extras = %{version}-%{release}
 BuildRequires : Sphinx
 BuildRequires : Z3-dev
-BuildRequires : Z3-dev32
 BuildRequires : binutils-dev
 BuildRequires : buildreq-cmake
 BuildRequires : buildreq-distutils3
@@ -35,15 +34,13 @@ BuildRequires : googletest-dev
 BuildRequires : libffi-dev
 BuildRequires : libstdc++-dev
 BuildRequires : libxml2-dev
-BuildRequires : libxml2-dev32
 BuildRequires : llvm
+BuildRequires : llvm9
 BuildRequires : ncurses-dev
-BuildRequires : protobuf-dev
 BuildRequires : python3-dev
 BuildRequires : subversion
 BuildRequires : valgrind-dev
 BuildRequires : zlib-dev
-BuildRequires : zlib-dev32
 Patch1: python2-shebangs.patch
 Patch2: llvm-0001-CMake-Split-static-library-exports-into-their-own-ex.patch
 Patch3: llvm-0002-Improve-physical-core-count-detection.patch
@@ -105,14 +102,15 @@ license components for the llvm8 package.
 
 %prep
 %setup -q -n llvm-8.0.1.src
-cd ..
-%setup -q -T -D -n llvm-8.0.1.src -b 2
-cd ..
-%setup -q -T -D -n llvm-8.0.1.src -b 1
+cd %{_builddir}
+tar xf %{_sourcedir}/cfe-8.0.1.src.tar.xz
+cd %{_builddir}
+tar xf %{_sourcedir}/SPIRV-8.0.1.1.tar.gz
+cd %{_builddir}/llvm-8.0.1.src
 mkdir -p tools/clang
-cp -r %{_topdir}/BUILD/cfe-8.0.1.src/* %{_topdir}/BUILD/llvm-8.0.1.src/tools/clang
+cp -r %{_builddir}/cfe-8.0.1.src/* %{_builddir}/llvm-8.0.1.src/tools/clang
 mkdir -p projects/SPIRV
-cp -r %{_topdir}/BUILD/SPIRV-LLVM-Translator-8.0.1-1/* %{_topdir}/BUILD/llvm-8.0.1.src/projects/SPIRV
+cp -r %{_builddir}/SPIRV-LLVM-Translator-8.0.1-1/* %{_builddir}/llvm-8.0.1.src/projects/SPIRV
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
@@ -132,7 +130,7 @@ export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1570597659
+export SOURCE_DATE_EPOCH=1587422576
 unset LD_AS_NEEDED
 mkdir -p clr-build
 pushd clr-build
@@ -140,13 +138,17 @@ export GCC_IGNORE_WERROR=1
 export CC=clang
 export CXX=clang++
 export LD=ld.gold
+CFLAGS=${CFLAGS/ -Wa,/ -fno-integrated-as -Wa,}
+CXXFLAGS=${CXXFLAGS/ -Wa,/ -fno-integrated-as -Wa,}
 export CFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wformat -Wformat-security -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
 export CXXFLAGS=$CFLAGS
+export FFLAGS="-O2 -g -Wp,-D_FORTIFY_SOURCE=2 -fexceptions -fstack-protector --param=ssp-buffer-size=32 -Wno-error -Wl,-z,max-page-size=0x1000 -march=westmere -mtune=haswell"
+export FCFLAGS=$FFLAGS
 unset LDFLAGS
 unset LDFLAGS
 export CFLAGS="$CFLAGS -fno-lto "
-export FCFLAGS="$CFLAGS -fno-lto "
-export FFLAGS="$CFLAGS -fno-lto "
+export FCFLAGS="$FFLAGS -fno-lto "
+export FFLAGS="$FFLAGS -fno-lto "
 export CXXFLAGS="$CXXFLAGS -fno-lto "
 %cmake .. -DCMAKE_C_FLAGS="`sed -E 's/-Wl,\S+\s//g; s/-Wp,-D_FORTIFY_SOURCE=2//' <<<$CFLAGS`" \
 -DCMAKE_CXX_FLAGS="`sed -E 's/-Wl,\S+\s//g; s/-Wp,-D_FORTIFY_SOURCE=2//' <<<$CXXFLAGS`" \
@@ -173,7 +175,9 @@ export CXXFLAGS="$CXXFLAGS -fno-lto "
 -DCLANG_TOOL_SCAN_VIEW_BUILD:BOOL=OFF \
 -DCLANG_TOOL_SCAN_BUILD_BUILD:BOOL=OFF \
 -DLLVM_TOOL_OPT_VIEWER_BUILD:BOOL=OFF \
--DLLVM_INSTALL_UTILS:BOOL=OFF
+-DLLVM_INSTALL_UTILS:BOOL=OFF \
+-DCMAKE_C_COMPILER=clang-9 \
+-DCMAKE_CXX_COMPILER=clang++-9
 make  %{?_smp_mflags}  VERBOSE=1
 popd
 
@@ -185,18 +189,18 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 make test
 
 %install
-export SOURCE_DATE_EPOCH=1570597659
+export SOURCE_DATE_EPOCH=1587422576
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/llvm8
-cp LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/LICENSE.TXT
-cp projects/SPIRV/LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/projects_SPIRV_LICENSE.TXT
-cp test/YAMLParser/LICENSE.txt %{buildroot}/usr/share/package-licenses/llvm8/test_YAMLParser_LICENSE.txt
-cp tools/clang/LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/tools_clang_LICENSE.TXT
-cp tools/clang/tools/clang-format-vs/ClangFormat/license.txt %{buildroot}/usr/share/package-licenses/llvm8/tools_clang_tools_clang-format-vs_ClangFormat_license.txt
-cp tools/msbuild/license.txt %{buildroot}/usr/share/package-licenses/llvm8/tools_msbuild_license.txt
-cp utils/benchmark/LICENSE %{buildroot}/usr/share/package-licenses/llvm8/utils_benchmark_LICENSE
-cp utils/unittest/googlemock/LICENSE.txt %{buildroot}/usr/share/package-licenses/llvm8/utils_unittest_googlemock_LICENSE.txt
-cp utils/unittest/googletest/LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/utils_unittest_googletest_LICENSE.TXT
+cp %{_builddir}/SPIRV-LLVM-Translator-8.0.1-1/LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/8f178caf2a2d6e6c711a30da69077572df356cf6
+cp %{_builddir}/cfe-8.0.1.src/LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/4b1bf296ce693a6396265c60a2bfc237cae9a14e
+cp %{_builddir}/cfe-8.0.1.src/tools/clang-format-vs/ClangFormat/license.txt %{buildroot}/usr/share/package-licenses/llvm8/59d395cdb2e7a9940a56014b5ab7184324ab5cd3
+cp %{_builddir}/llvm-8.0.1.src/LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/e20dfaf19593ba52e55f3fd6e34532193f594fbb
+cp %{_builddir}/llvm-8.0.1.src/test/YAMLParser/LICENSE.txt %{buildroot}/usr/share/package-licenses/llvm8/c01c212bdf3925189f673e2081b44094023860ea
+cp %{_builddir}/llvm-8.0.1.src/tools/msbuild/license.txt %{buildroot}/usr/share/package-licenses/llvm8/59d395cdb2e7a9940a56014b5ab7184324ab5cd3
+cp %{_builddir}/llvm-8.0.1.src/utils/benchmark/LICENSE %{buildroot}/usr/share/package-licenses/llvm8/2b8b815229aa8a61e483fb4ba0588b8b6c491890
+cp %{_builddir}/llvm-8.0.1.src/utils/unittest/googlemock/LICENSE.txt %{buildroot}/usr/share/package-licenses/llvm8/5a2314153eadadc69258a9429104cd11804ea304
+cp %{_builddir}/llvm-8.0.1.src/utils/unittest/googletest/LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/5a2314153eadadc69258a9429104cd11804ea304
 pushd clr-build
 %make_install
 popd
@@ -211,16 +215,22 @@ rm -f %{buildroot}/usr/lib64/clang/8.0.1/lib/linux/libclang_rt.scudo_minimal-i38
 rm -f %{buildroot}/usr/lib64/clang/8.0.1/lib/linux/libclang_rt.ubsan_minimal-i386.so
 rm -f %{buildroot}/usr/lib64/clang/8.0.1/lib/linux/libclang_rt.ubsan_standalone-i386.so
 ## install_append content
+# Rename the Gold plugin elsewhere, as we're erasing *.so below
 mv %{buildroot}/usr/lib64/LLVMgold.so %{buildroot}/usr/lib64/LLVMgold.so.save
+
+# Remove files that should come from the main llvm package
 rm -rf %{buildroot}/usr/include
 rm -rf %{buildroot}/usr/lib64/*.a
 rm -rf %{buildroot}/usr/lib64/*.so
 rm -rf %{buildroot}/usr/lib64/cmake
 rm -rf %{buildroot}/usr/lib64/pkgconfig
 rm -rf %{buildroot}/usr/libexec
+
 mv %{buildroot}/usr/share/package-licenses %{buildroot}/usr/
 rm -rf %{buildroot}/usr/share/*
 mv %{buildroot}/usr/package-licenses %{buildroot}/usr/share
+
+# Move the tools to a versioned bin dir and then create symlinks back
 pushd %{buildroot}/usr
 FULL_VERSION=%{version}
 VERSION=${FULL_VERSION%%%%.*}
@@ -229,11 +239,14 @@ mkdir bin
 for f in lib64/clang/$FULL_VERSION/bin/*; do
 case "$f" in
 *-$VERSION)
+# Already versioned, leave it alone
 continue
 ;;
 esac
 ln -s ../$f bin/${f##*/}-$VERSION
 done
+
+# Put the LLVM gold plugin back, under the versioned name
 mv lib64/LLVMgold.so.save lib64/LLVMgold-$VERSION.so
 mkdir -p lib/bfd-plugins
 ln -s ../../lib64/LLVMgold-$VERSION.so lib/bfd-plugins
@@ -562,12 +575,10 @@ popd
 
 %files license
 %defattr(0644,root,root,0755)
-/usr/share/package-licenses/llvm8/LICENSE.TXT
-/usr/share/package-licenses/llvm8/projects_SPIRV_LICENSE.TXT
-/usr/share/package-licenses/llvm8/test_YAMLParser_LICENSE.txt
-/usr/share/package-licenses/llvm8/tools_clang_LICENSE.TXT
-/usr/share/package-licenses/llvm8/tools_clang_tools_clang-format-vs_ClangFormat_license.txt
-/usr/share/package-licenses/llvm8/tools_msbuild_license.txt
-/usr/share/package-licenses/llvm8/utils_benchmark_LICENSE
-/usr/share/package-licenses/llvm8/utils_unittest_googlemock_LICENSE.txt
-/usr/share/package-licenses/llvm8/utils_unittest_googletest_LICENSE.TXT
+/usr/share/package-licenses/llvm8/2b8b815229aa8a61e483fb4ba0588b8b6c491890
+/usr/share/package-licenses/llvm8/4b1bf296ce693a6396265c60a2bfc237cae9a14e
+/usr/share/package-licenses/llvm8/59d395cdb2e7a9940a56014b5ab7184324ab5cd3
+/usr/share/package-licenses/llvm8/5a2314153eadadc69258a9429104cd11804ea304
+/usr/share/package-licenses/llvm8/8f178caf2a2d6e6c711a30da69077572df356cf6
+/usr/share/package-licenses/llvm8/c01c212bdf3925189f673e2081b44094023860ea
+/usr/share/package-licenses/llvm8/e20dfaf19593ba52e55f3fd6e34532193f594fbb
