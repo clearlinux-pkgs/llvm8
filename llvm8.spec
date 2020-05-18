@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : llvm8
 Version  : 8.0.1
-Release  : 9
+Release  : 10
 URL      : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
 Source0  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
 Source1  : https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/v8.0.1-1/SPIRV-8.0.1.1.tar.gz
@@ -45,15 +45,16 @@ Patch1: python2-shebangs.patch
 Patch2: llvm-0001-CMake-Split-static-library-exports-into-their-own-ex.patch
 Patch3: llvm-0002-Improve-physical-core-count-detection.patch
 Patch4: llvm-0003-Produce-a-normally-versioned-libLLVM.patch
-Patch5: clang-0001-Allow-building-split-libclang-libraries-with-unified.patch
-Patch6: clang-0002-Detect-Clear-Linux-and-apply-Clear-s-default-linker-.patch
-Patch7: clang-0003-Make-Clang-default-to-Westmere-on-Clear-Linux.patch
-Patch8: clang-0004-Change-type-of-block-pointer-for-OpenCL.patch
-Patch9: clang-0005-Simplify-LLVM-IR-generated-for-OpenCL-blocks.patch
-Patch10: clang-0006-Fix-assertion-due-to-blocks.patch
-Patch11: clang-0007-Add-the-LLVM-major-version-number-to-the-Gold-LTO-pl.patch
-Patch12: fma.patch
-Patch13: clang-gcc.patch
+Patch5: llvm-0004-NFC-include-cstdint-string-prior-to-using-uint8_t-st.patch
+Patch6: clang-0001-Allow-building-split-libclang-libraries-with-unified.patch
+Patch7: clang-0002-Detect-Clear-Linux-and-apply-Clear-s-default-linker-.patch
+Patch8: clang-0003-Make-Clang-default-to-Westmere-on-Clear-Linux.patch
+Patch9: clang-0004-Change-type-of-block-pointer-for-OpenCL.patch
+Patch10: clang-0005-Simplify-LLVM-IR-generated-for-OpenCL-blocks.patch
+Patch11: clang-0006-Fix-assertion-due-to-blocks.patch
+Patch12: clang-0007-Add-the-LLVM-major-version-number-to-the-Gold-LTO-pl.patch
+Patch13: fma.patch
+Patch14: clang-gcc.patch
 
 %description
 See docs/CMake.html for instructions on how to build LLVM with CMake.
@@ -124,13 +125,14 @@ cp -r %{_builddir}/SPIRV-LLVM-Translator-8.0.1-1/* %{_builddir}/llvm-8.0.1.src/p
 %patch11 -p1
 %patch12 -p1
 %patch13 -p1
+%patch14 -p1
 
 %build
 export http_proxy=http://127.0.0.1:9/
 export https_proxy=http://127.0.0.1:9/
 export no_proxy=localhost,127.0.0.1,0.0.0.0
 export LANG=C.UTF-8
-export SOURCE_DATE_EPOCH=1587422576
+export SOURCE_DATE_EPOCH=1589822334
 unset LD_AS_NEEDED
 mkdir -p clr-build
 pushd clr-build
@@ -189,7 +191,7 @@ export no_proxy=localhost,127.0.0.1,0.0.0.0
 make test
 
 %install
-export SOURCE_DATE_EPOCH=1587422576
+export SOURCE_DATE_EPOCH=1589822334
 rm -rf %{buildroot}
 mkdir -p %{buildroot}/usr/share/package-licenses/llvm8
 cp %{_builddir}/SPIRV-LLVM-Translator-8.0.1-1/LICENSE.TXT %{buildroot}/usr/share/package-licenses/llvm8/8f178caf2a2d6e6c711a30da69077572df356cf6

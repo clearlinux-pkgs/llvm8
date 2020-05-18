@@ -3,6 +3,7 @@ python2-shebangs.patch
 llvm-0001-CMake-Split-static-library-exports-into-their-own-ex.patch
 llvm-0002-Improve-physical-core-count-detection.patch
 llvm-0003-Produce-a-normally-versioned-libLLVM.patch
+llvm-0004-NFC-include-cstdint-string-prior-to-using-uint8_t-st.patch
 
 # clang patches
 clang-0001-Allow-building-split-libclang-libraries-with-unified.patch
