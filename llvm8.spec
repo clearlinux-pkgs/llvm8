@@ -7,7 +7,7 @@
 %define keepstatic 1
 Name     : llvm8
 Version  : 8.0.1
-Release  : 10
+Release  : 11
 URL      : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
 Source0  : https://github.com/llvm/llvm-project/releases/download/llvmorg-8.0.1/llvm-8.0.1.src.tar.xz
 Source1  : https://github.com/KhronosGroup/SPIRV-LLVM-Translator/archive/v8.0.1-1/SPIRV-8.0.1.1.tar.gz
